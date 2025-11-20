@@ -11,10 +11,10 @@ Model name is converted to lowercase for the collection name:
 - BlogPost -> "blogs" collection
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List
 
-# Example schemas (replace with your own):
+# Example schemas (retain examples for reference)
 
 class User(BaseModel):
     """
@@ -38,11 +38,26 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+# Coffee shop specific schemas
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class CoffeeItem(BaseModel):
+    """
+    Coffee menu items
+    Collection name: "coffeeitem"
+    """
+    name: str = Field(..., description="Drink or pastry name")
+    description: Optional[str] = Field(None, description="Short description of the item")
+    price: float = Field(..., ge=0, description="Price in local currency")
+    category: str = Field("coffee", description="Category like coffee, tea, pastry, seasonal")
+    tags: Optional[List[str]] = Field(default=None, description="Tags like hot, iced, vegan, new")
+    available: bool = Field(True, description="Whether currently available")
+
+class ContactMessage(BaseModel):
+    """
+    Contact messages from website form
+    Collection name: "contactmessage"
+    """
+    name: str = Field(..., description="Sender name")
+    email: EmailStr = Field(..., description="Sender email")
+    message: str = Field(..., min_length=5, max_length=2000, description="Message body")
+    subject: Optional[str] = Field(None, description="Optional subject")
